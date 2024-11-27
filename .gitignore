@@ -1,0 +1,13 @@
+
+# Eclipse files
+**/target/
+**/bin/
+**/.settings/
+**/.classpath
+**/.project
+
+
+# Temporary files
+~*
+
+*.log

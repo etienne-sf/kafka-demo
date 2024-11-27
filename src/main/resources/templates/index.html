@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CPU Usage Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>CPU Usage - Last Minute</h1>
+    <canvas id="cpuChart" width="800" height="400"></canvas>
+
+    <script>
+        const maxPoints = 60; // Maximum de points (1 point/seconde sur une minute)
+        const initialLabels = Array.from({ length: maxPoints }, (_, i) => `${maxPoints - i} sec`);
+        const initialData = Array(maxPoints).fill(null); // Tableau initial vide
+
+        // Initialisation du graphique
+        const ctx = document.getElementById('cpuChart').getContext('2d');
+        const cpuChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: initialLabels, // De droite à gauche
+                datasets: [{
+                    label: 'CPU Usage (%)',
+                    data: initialData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                animation: false, // Désactiver les animations pour une mise à jour fluide
+                responsive: true,
+                scales: {
+                    x: {
+                        reverse: true // Afficher les données de droite à gauche
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Fonction pour ajouter un nouveau point
+        function addDataPoint(newPoint) {
+            cpuChart.data.labels.unshift(""); // Ajouter un nouvel emplacement de label
+            cpuChart.data.datasets[0].data.unshift(newPoint); // Ajouter la nouvelle donnée à gauche
+
+            if (cpuChart.data.labels.length > maxPoints) {
+                cpuChart.data.labels.pop(); // Supprimer le label le plus ancien
+                cpuChart.data.datasets[0].data.pop(); // Supprimer la donnée la plus ancienne
+            }
+
+            cpuChart.update(); // Mettre à jour le graphique
+        }
+
+        // Fonction pour récupérer les nouvelles données depuis l'API
+        function fetchNewData() {
+            fetch('/api/cpu-data')
+                .then(response => response.json())
+                .then(cpuData => {
+                    const lastPoint = cpuData[cpuData.length - 1]; // Dernier point de la liste
+                    addDataPoint(lastPoint || 0); // Ajouter le point (ou 0 si invalide)
+                })
+                .catch(error => console.error('Erreur lors de la récupération des données :', error));
+        }
+
+        // Mettre à jour le graphique toutes les secondes
+        setInterval(fetchNewData, 1000);
+    </script>
+</body>
+</html>
