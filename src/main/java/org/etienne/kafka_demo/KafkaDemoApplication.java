@@ -3,9 +3,11 @@ package org.etienne.kafka_demo;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.etienne.kafka_demo.utils.AvroSerializer;
+import org.etienne.kafka_demo.utils.Util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,24 +25,49 @@ public class KafkaDemoApplication {
 	@Value("${kafka.port}")
 	int kafkaPort;
 
+	@Value("${kafka.schema.registry.url}")
+	String schemaRegistryUrl;
+
+	public static Map<String, Schema> schemasMonitoringCpu = null;
+
 	public static void main(String[] args) {
 		SpringApplication.run(KafkaDemoApplication.class, args);
 	}
 
 	@Bean
-	public ProducerFactory<Integer, String> producerFactory() {
+	public Map<String, Object> producerConfigs() {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost + ":" + kafkaPort);
-		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
-		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		// See https://kafka.apache.org/documentation/#producerconfigs for more properties
-
-		return new DefaultKafkaProducerFactory<>(props);
+		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroSerializer.class);
+		return props;
 	}
 
 	@Bean
-	public KafkaTemplate<Integer, String> kafkaTemplate() {
-		return new KafkaTemplate<Integer, String>(producerFactory());
+	public ProducerFactory<String, CpuUsage> producerFactory() {
+		return new DefaultKafkaProducerFactory<>(producerConfigs());
 	}
+
+	@Bean
+	public KafkaTemplate<String, CpuUsage> kafkaTemplate() {
+		return new KafkaTemplate<String, CpuUsage>(producerFactory());
+	}
+
+	/**
+	 * Consruction de la {@link Map} des schémas avro pour le topic des CPU. La clé est la version (v1, v2...). La
+	 * valeur est l'instance de {@link Schema} correspondante.
+	 * 
+	 * @param util
+	 * @return
+	 */
+	@Bean
+	public Map<String, Schema> schemasMonitoringCpu(Util util) {
+		// Constructionn du singletong accessibles aux sérialiseurs et désérialiseurs en même temps
+		schemasMonitoringCpu = new HashMap<>();
+
+		schemasMonitoringCpu.put("v1", util.loadSchema("avro/monitoring.cpu_v1.avsc"));
+
+		return schemasMonitoringCpu;
+	};
 
 }

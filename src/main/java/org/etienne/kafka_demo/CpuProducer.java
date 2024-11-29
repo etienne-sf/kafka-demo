@@ -3,8 +3,10 @@
  */
 package org.etienne.kafka_demo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
+
+import org.apache.avro.Schema;
+import org.etienne.kafka_demo.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -23,7 +25,7 @@ import oshi.hardware.HardwareAbstractionLayer;
 @Component
 public class CpuProducer implements CommandLineRunner {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(CpuProducer.class);
+	// private static Logger LOGGER = LoggerFactory.getLogger(CpuProducer.class);
 
 	@Value("${cpu.delai.mesure}")
 	long delaiEntreDeuxMesures;
@@ -32,20 +34,41 @@ public class CpuProducer implements CommandLineRunner {
 	String topicName;
 
 	@Autowired
-	KafkaTemplate<Integer, String> kafkaTemplate;
+	KafkaTemplate<String, CpuUsage> kafkaTemplate;
+
+	@Autowired
+	Map<String, Schema> schemasMonitoringCpu;
+
+	@Autowired
+	Util util;
+
+	protected CentralProcessor cpu;
+
+	public CpuProducer() {
+		SystemInfo si = new SystemInfo();
+		HardwareAbstractionLayer hal = si.getHardware();
+		cpu = hal.getProcessor();
+	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		SystemInfo si = new SystemInfo();
-		HardwareAbstractionLayer hal = si.getHardware();
-		CentralProcessor cpu = hal.getProcessor();
-		double nbTicks;
-
 		while (true) {
-			nbTicks = cpu.getSystemCpuLoad(1000); // Usage de la CPU pendant les 1000 ms de délai
-			// LOGGER.info("publication de la cpu : nbTicks={}", nbTicks);
-			kafkaTemplate.send(topicName, Double.toString(nbTicks));
+			produitUnMessage();
+
 		}
+	}
+
+	/**
+	 * Cette message isole la production d'un message. Cela permet de l'utilise dans les tests unitaires, pour vérifier
+	 * la sérialisation et désérialisation associée
+	 */
+	public void produitUnMessage() {
+		double nbTicks = cpu.getSystemCpuLoad(1000); // Usage de la CPU pendant les 1000 ms de délai
+
+		CpuUsage cpuUsage = CpuUsage.newBuilder()//
+				.setCpu(nbTicks)//
+				.build();
+		kafkaTemplate.send(topicName, cpuUsage);
 	}
 
 }

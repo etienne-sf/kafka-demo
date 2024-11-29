@@ -1,0 +1,6 @@
+spring:
+  kafka:
+    consumer:
+      # earliest : permet de s'assurer que le consommateur aura tous les messages, même s'il démarre après
+      auto-offset-reset: earliest
+      group-id: cpuTest

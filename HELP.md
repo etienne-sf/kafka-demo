@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'org.etienne.kafka-demo' is invalid and this project uses 'org.etienne.kafka_demo' instead.
+* The original package name 'org.etienne.kafka-demo' is invalid and this project uses 'org.etienne.kafka_demo.test' instead.
 
 # Getting Started
 

@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "CpuUsage",
+  "namespace": "org.etienne.kafka_demo.test",
+  "fields": [
+    {
+      "name": "cpu",
+      "type": "double",
+      "doc": "CPU usage percentage as a decimal number"
+    }
+  ]
+}
