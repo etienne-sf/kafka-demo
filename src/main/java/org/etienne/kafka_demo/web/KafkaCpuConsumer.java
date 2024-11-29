@@ -1,23 +1,24 @@
 package org.etienne.kafka_demo.web;
 
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.avro.Schema;
-import org.etienne.kafka_demo.CpuUsage;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.etienne.kafka_demo.CpuProducer;
 import org.etienne.kafka_demo.utils.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Header;
 
 import jakarta.annotation.PostConstruct;
 
 //@Service
 public class KafkaCpuConsumer {
+
 	private static Logger LOGGER = LoggerFactory.getLogger(KafkaCpuConsumer.class);
-	private final int MAX_NB_VALEURS = 60; // 1 point par seconde. 60 = 1 minute
 
 	@Value("${kafka.consumer.group.monitoring.cpu}")
 	String nomTopic;
@@ -28,7 +29,8 @@ public class KafkaCpuConsumer {
 	@Autowired
 	Map<String, Schema> schemasMonitoringCpu;
 
-	private final CopyOnWriteArrayList<Double> cpuData = new CopyOnWriteArrayList<>();
+	/** Dernier message reçu sur Kafka. Ce message sera récupéré par la page web pour affichage */
+	private Object derniereMesureRecu;
 
 	@PostConstruct
 	void postConstruct() {
@@ -36,23 +38,12 @@ public class KafkaCpuConsumer {
 	}
 
 	@KafkaListener(topics = "${kafka.topic.monitoring.cpu}", groupId = "${kafka.consumer.group.monitoring.cpu}", containerFactory = "kafkaListenerContainerFactory")
-	public void consume(/*
-						 * @Header(name = KafkaHeaders.RECEIVED_KEY, required = false) String key, //
-						 * 
-						 * @Header(KafkaHeaders.RECEIVED_TOPIC) String topic, //
-						 */
-			CpuUsage cpuUsage) {
+	public void consume(//
+			@Header(CpuProducer.HEADER_VERSION) String version, //
+			ConsumerRecord<String, Object> message) {
 
-		// Record dispose des méta données suivantes : partition, offset, timestamp, key
-		// Le message est dans "value"
-
-		LOGGER.trace("Valeur reçue sur le topic {} : cpu={}", nomTopic, cpuUsage.getCpu());
-
-		double value = cpuUsage.getCpu() * 100;
-		if (cpuData.size() >= MAX_NB_VALEURS) { // Limite les données à MAX_NB_VALEURS points
-			cpuData.remove(0);
-		}
-		cpuData.add(value);
+		derniereMesureRecu = message.value();
+		LOGGER.trace("Valeur de type {} reçue sur le topic {}", message.getClass().getSimpleName(), nomTopic);
 	}
 
 	/**
@@ -61,7 +52,7 @@ public class KafkaCpuConsumer {
 	 * 
 	 * @return
 	 */
-	public CopyOnWriteArrayList<Double> getCpuData() {
-		return cpuData;
+	public Object getDerniereMesureRecu() {
+		return derniereMesureRecu;
 	}
 }

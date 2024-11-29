@@ -7,7 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.etienne.kafka_demo.CpuProducer;
-import org.etienne.kafka_demo.CpuUsage;
+import org.etienne.kafka_demo.CpuUsage1;
 import org.etienne.kafka_demo.web.KafkaCpuConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -27,7 +27,7 @@ public class CpuConsumerForTest {
 
 	private CountDownLatch latch = new CountDownLatch(1);
 
-	CpuUsage lastReceivedMessage = null;
+	CpuUsage1 lastReceivedMessage = null;
 
 	@KafkaListener(topics = "${kafka.topic.monitoring.cpu}", groupId = "${kafka.consumer.group.monitoring.cpu}")
 	public void consume(/*
@@ -35,8 +35,8 @@ public class CpuConsumerForTest {
 						 * 
 						 * @Header(KafkaHeaders.RECEIVED_TOPIC) String topic, //
 						 */
-			CpuUsage cpuUsage) {
-		cpuConsumer.consume(cpuUsage);
+			CpuUsage1 cpuUsage) {
+		// cpuConsumer.consume("v1", cpuUsage);
 		lastReceivedMessage = cpuUsage;
 		latch.countDown();
 	}
@@ -50,7 +50,7 @@ public class CpuConsumerForTest {
 		return latch.await(duration, unit);
 	}
 
-	public CpuUsage getLastReceivedMessage() {
+	public CpuUsage1 getLastReceivedMessage() {
 		return lastReceivedMessage;
 	}
 

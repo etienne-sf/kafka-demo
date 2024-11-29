@@ -33,8 +33,9 @@ kafka-topics.bat --create --topic "monitoring.cpu.01" --bootstrap-server localho
 ## Visualisation des infos sur un topic
 
 ```
-kafka-topics.bat  --describe --topic "monitoring.cpu.01" --bootstrap-server localhost:9092
+kafka-topics.bat  --describe --from --topic "monitoring.cpu.01" --bootstrap-server localhost:9092
 ```
+
 
 ## Ecriture de données dans un topic
 
@@ -44,8 +45,15 @@ kafka-console-producer.bat --topic "monitoring.cpu.01" --bootstrap-server localh
 
 ## Lecture de données dans un topic
 
+En lisant le topic depuis le début :
+
 ```
 kafka-console-consumer.bat --topic "monitoring.cpu.01" --from-beginning --bootstrap-server localhost:9092
 ```
 
+Ou à partir de ce qui sera ensuite publié :
+
+```
+kafka-console-consumer.bat --topic "monitoring.cpu.01" --bootstrap-server localhost:9092
+```
 

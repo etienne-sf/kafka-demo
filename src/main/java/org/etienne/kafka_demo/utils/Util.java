@@ -3,15 +3,9 @@
  */
 package org.etienne.kafka_demo.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.Decoder;
-import org.apache.avro.io.DecoderFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,10 +35,4 @@ public class Util {
 		}
 	}
 
-	public GenericRecord deserializeAvroMessage(byte[] message, Schema schema) throws IOException {
-		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(message);
-		Decoder decoder = DecoderFactory.get().binaryDecoder(inputStream, null);
-		return reader.read(null, decoder);
-	}
 }

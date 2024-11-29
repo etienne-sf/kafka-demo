@@ -44,13 +44,13 @@ public class KafkaDemoApplication {
 	}
 
 	@Bean
-	public ProducerFactory<String, CpuUsage> producerFactory() {
+	public ProducerFactory<String, CpuUsage1> producerFactory() {
 		return new DefaultKafkaProducerFactory<>(producerConfigs());
 	}
 
 	@Bean
-	public KafkaTemplate<String, CpuUsage> kafkaTemplate() {
-		return new KafkaTemplate<String, CpuUsage>(producerFactory());
+	public KafkaTemplate<String, CpuUsage1> kafkaTemplate() {
+		return new KafkaTemplate<String, CpuUsage1>(producerFactory());
 	}
 
 	/**
@@ -66,6 +66,7 @@ public class KafkaDemoApplication {
 		schemasMonitoringCpu = new HashMap<>();
 
 		schemasMonitoringCpu.put("v1", util.loadSchema("avro/monitoring.cpu_v1.avsc"));
+		schemasMonitoringCpu.put("v2", util.loadSchema("avro/monitoring.cpu_v2.avsc"));
 
 		return schemasMonitoringCpu;
 	};

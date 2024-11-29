@@ -1,7 +1,7 @@
 {
   "type": "record",
-  "name": "CpuUsage",
-  "namespace": "org.etienne.kafka_demo.test",
+  "name": "CpuUsage1",
+  "namespace": "org.etienne.kafka_demo",
   "fields": [
     {
       "name": "cpu",

@@ -59,8 +59,8 @@
 		<!-- 
 			dev-tools cause l'erreur ci-dessous :
 			 org.springframework.messaging.converter.MessageConversionException: 
-			    Cannot convert from [org.etienne.kafka_demo.CpuUsage] 
-			    to [org.etienne.kafka_demo.CpuUsage] 
+			    Cannot convert from [org.etienne.kafka_demo.CpuUsage1] 
+			    to [org.etienne.kafka_demo.CpuUsage1] 
 			    for GenericMessage [payload={"cpu": 0.8007001750437609} ...
 		-->
 		<!--dependency>

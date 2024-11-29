@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.etienne.kafka_demo.CpuUsage;
+import org.etienne.kafka_demo.CpuUsage1;
 import org.etienne.kafka_demo.utils.AvroDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,14 +33,14 @@ public class KafkaConsumerConfig {
 	}
 
 	@Bean
-	public ConsumerFactory<String, CpuUsage> consumerFactory() {
+	public ConsumerFactory<String, CpuUsage1> consumerFactory() {
 		return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-				new AvroDeserializer<CpuUsage>(CpuUsage.class, "v1"));
+				new AvroDeserializer<CpuUsage1>(CpuUsage1.class));
 	}
 
 	@Bean
-	public ConcurrentKafkaListenerContainerFactory<String, CpuUsage> kafkaListenerContainerFactory() {
-		ConcurrentKafkaListenerContainerFactory<String, CpuUsage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+	public ConcurrentKafkaListenerContainerFactory<String, CpuUsage1> kafkaListenerContainerFactory() {
+		ConcurrentKafkaListenerContainerFactory<String, CpuUsage1> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory());
 		return factory;
 	}

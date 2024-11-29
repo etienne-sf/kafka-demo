@@ -27,10 +27,10 @@ class EmbeddedKafkaIntegrationTest {
 		cpuConsumer.resetLatch();
 	}
 
-	// @Test ==> Ne fonctionne pas
+	// @Test ==> Commenté, car ne fonctionne pas
 	public void testProductionEtConsommationMessageCpu() throws Exception {
 
-		cpuProducer.produitUnMessage();
+		cpuProducer.setNbIterations(1);
 
 		boolean messageConsumed = cpuConsumer.await(10, TimeUnit.SECONDS);
 		assertTrue(messageConsumed);

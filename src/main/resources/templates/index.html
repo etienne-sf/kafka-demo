@@ -4,11 +4,91 @@
     <meta charset="UTF-8">
     <title>CPU Usage Chart</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <h1>Utilisation de la CPU - Dernière minute</h1>
-    <canvas id="cpuChart" width="800" height="400"></canvas>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
 
+        #parameters {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            border-bottom: 1px solid #ccc;
+            height: 15%;
+        }
+
+        #parameters label {
+            margin: 0 10px;
+            font-size: 16px;
+        }
+
+        #chart-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+        }
+
+        canvas {
+            max-width: 90%;
+            max-height: 90%;
+        }
+    </style></head>
+<body>
+    <!-- Paramètres -->
+    <div id="parameters">
+        <form>
+        	 <fieldset>
+        	 	<legend>Version des messages</legend>
+	            <label>
+	                <input type="radio" name="versionMessageKafka" value="v1" checked>
+	                v1
+	            </label>
+	            <label>
+	                <input type="radio" name="versionMessageKafka" value="v2">
+	                v2
+	            </label>
+            </fieldset>
+        </form>
+    </div>
+    <h1>Utilisation de la CPU - Dernière minute</h1>
+    <div id="chart-container">
+        <canvas id="cpuChart"></canvas>
+    </div>
+
+
+	<script>
+		document.querySelectorAll('input[name="versionMessageKafka"]').forEach(radio => {
+		    radio.addEventListener('change', (event) => {
+		        const version = event.target.value;
+		        
+		        // Appel API pour envoyer la version sélectionnée
+		        fetch('/api/version', {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/x-www-form-urlencoded'
+		            },
+		            body: `version=${version}`
+		        })
+		        .then(response => {
+		            if (response.ok) {
+		                console.log(`Version sélectionnée : ${version}`);
+		            } else {
+		                console.error('Erreur lors de l\'envoi de la version');
+		            }
+		        })
+		        .catch(error => console.error('Erreur réseau :', error));
+		    });
+		});
+	</script>
+    
+    
     <script>
         const maxPoints = 60; // Maximum de points (1 point/seconde sur une minute)
         const initialLabels = Array.from({ length: maxPoints }, (_, i) => `${maxPoints - i} sec`);
@@ -19,56 +99,80 @@
         const cpuChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: initialLabels, // De droite à gauche
-                datasets: [{
-                    label: 'Utilisation CPU (%)',
-                    data: initialData,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 2
-                }]
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Total CPU (%)',
+                        data: [],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'User CPU (%)',
+                        data: [],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'System CPU (%)',
+                        data: [],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
             },
             options: {
-                animation: false, // Désactiver les animations pour une mise à jour fluide
+            	animation: false, // Désactiver les animations pour une mise à jour fluide
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     x: {
-                        reverse: true // Afficher les données de droite à gauche
+                        title: { display: true, text: 'Time (seconds)' }
                     },
                     y: {
                         beginAtZero: true,
-                        max: 100
+                        title: { display: true, text: 'CPU Usage (%)' }
                     }
                 }
             }
         });
 
-        // Fonction pour ajouter un nouveau point
-        function addDataPoint(newPoint) {
-            cpuChart.data.labels.unshift(""); // Ajouter un nouvel emplacement de label
-            cpuChart.data.datasets[0].data.unshift(newPoint); // Ajouter la nouvelle donnée à gauche
+        // Fonction pour ajouter une nouvelle série de points
+	     const updateChart = (data) => {
+	            const { cpu, user, sys } = data;
+	            console.info('Valeurs de CPU reçues : ', data);
+	
+	            // Ajouter les nouvelles données
+	            if (cpuChart.data.labels.length >= 60) {
+	                cpuChart.data.labels.shift();
+	                cpuChart.data.datasets[0].data.shift(); // CPU Totale
+	                cpuChart.data.datasets[1].data.shift(); // User
+	                cpuChart.data.datasets[2].data.shift(); // Sys
+	            }
+	
+	            const currentTime = new Date().toLocaleTimeString();
+	            cpuChart.data.labels.push(currentTime);
+	            cpuChart.data.datasets[0].data.push(cpu);
+	            cpuChart.data.datasets[1].data.push(user);
+	            cpuChart.data.datasets[2].data.push(sys);
+	
+	            // Mettre à jour le graphique
+	            cpuChart.update();
+	        };
 
-            if (cpuChart.data.labels.length > maxPoints) {
-                cpuChart.data.labels.pop(); // Supprimer le label le plus ancien
-                cpuChart.data.datasets[0].data.pop(); // Supprimer la donnée la plus ancienne
-            }
-
-            cpuChart.update(); // Mettre à jour le graphique
-        }
-
-        // Fonction pour récupérer les nouvelles données depuis l'API
-        function fetchNewData() {
-            fetch('/api/cpu-data')
-                .then(response => response.json())
-                .then(cpuData => {
-                    const lastPoint = cpuData[cpuData.length - 1]; // Dernier point de la liste
-                    addDataPoint(lastPoint || 0); // Ajouter le point (ou 0 si invalide)
-                })
-                .catch(error => console.error('Erreur lors de la récupération des données :', error));
-        }
-
-        // Mettre à jour le graphique toutes les secondes
-        setInterval(fetchNewData, 1000);
+	        // Fonction pour récupérer les nouvelles données depuis l'API : un appel toutes les secondes
+	        // Simulation de données provenant de l'API (remplacez avec un vrai fetch)
+	        setInterval(() => {
+	            fetch('/api/cpu-usage')
+	                .then(response => response.json())
+	                .then(data => {
+	                    updateChart(data);
+	                })
+	                .catch(error => console.error('Erreur lors de la récupération des données :', error));
+	        }, 1000);
     </script>
 </body>
 </html>

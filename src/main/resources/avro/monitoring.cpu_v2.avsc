@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "CpuUsage2",
+  "namespace": "org.etienne.kafka_demo",
+  "fields": [
+    {
+      "name": "cpu",
+      "type": "double",
+      "doc": "Pourcentage d'utilisation total du processeur"
+    },
+    {
+      "name": "user",
+      "type": "double",
+      "doc": "Pourcentage d'utilisation 'user' du processeur"
+    },
+    {
+      "name": "sys",
+      "type": "double",
+      "doc": "Pourcentage d'utilisation 'sys' du processeur"
+    }
+  ]
+}
