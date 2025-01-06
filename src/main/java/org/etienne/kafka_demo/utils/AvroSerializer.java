@@ -13,16 +13,16 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 
  * @See https://codenotfound.com/spring-kafka-apache-avro-serializer-deserializer-example.html
  *
- * @param <T>
- *            La classe source de la sérialisation
+ * @param <T> La classe source de la sérialisation
  */
+@Slf4j
 public class AvroSerializer<T extends SpecificRecordBase> implements Serializer<T> {
-
-	// private static final Logger LOGGER = LoggerFactory.getLogger(AvroSerializer.class);
 
 	@Override
 	public void close() {

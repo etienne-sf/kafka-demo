@@ -13,19 +13,17 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.etienne.kafka_demo.KafkaDemoApplication;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
  * @See https://codenotfound.com/spring-kafka-apache-avro-serializer-deserializer-example.html
  *
- * @param <T>
- *            La classe cible de la sérialisation
+ * @param <T> La classe cible de la sérialisation
  */
+@Slf4j
 public class AvroDeserializer<T extends SpecificRecordBase> implements Deserializer<T> {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AvroDeserializer.class);
 
 	protected final Class<T> targetType;
 
@@ -61,7 +59,7 @@ public class AvroDeserializer<T extends SpecificRecordBase> implements Deseriali
 				Decoder decoder = DecoderFactory.get().binaryDecoder(data, null);
 				@SuppressWarnings("unchecked")
 				T result = (T) datumReader.read(null, decoder);
-				LOGGER.trace("Réception d'un message de version {}: ", schemaVersion, result);
+				log.trace("Réception d'un message de version {}: ", schemaVersion, result);
 				return result;
 			}
 		} catch (Exception ex) {

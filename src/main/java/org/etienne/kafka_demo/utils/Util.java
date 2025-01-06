@@ -8,19 +8,22 @@ import java.io.InputStream;
 import org.apache.avro.Schema;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Différents utilitaires
  * 
  * @author etienne-sf
  */
 @Component
+@Slf4j
 public class Util {
 
 	/**
 	 * Chargement d'un schéma avro depuis un fichier accessible dans le jar.
 	 * 
-	 * @param resourcePath
-	 *            Path vers le fichier qui contient le schéma (ex: avro/monitoring.cpu_v01.avsc)
+	 * @param resourcePath Path vers le fichier qui contient le schéma (ex:
+	 *                     avro/monitoring.cpu_v01.avsc)
 	 * @return
 	 */
 	public Schema loadSchema(String resourcePath) {

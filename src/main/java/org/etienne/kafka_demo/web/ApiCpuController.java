@@ -5,16 +5,15 @@ import java.util.Map;
 
 import org.etienne.kafka_demo.CpuUsage1;
 import org.etienne.kafka_demo.CpuUsage2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class ApiCpuController {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger LOGGER = LoggerFactory.getLogger(KafkaCpuConsumer.class);
+@RestController
+@Slf4j
+public class ApiCpuController {
 
 	@Autowired
 	private KafkaCpuConsumer kafkaCpuConsumer;
@@ -32,7 +31,7 @@ public class ApiCpuController {
 				map.put("user", ((CpuUsage2) o).getUser());
 				map.put("sys", ((CpuUsage2) o).getSys());
 			} else {
-				LOGGER.error("Type d'objet inconnu : {}", o.getClass().getName());
+				log.error("Type d'objet inconnu : {}", o.getClass().getName());
 			}
 		}
 

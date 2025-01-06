@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.etienne.kafka_demo.utils.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -18,20 +16,22 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.CentralProcessor.TickType;
 import oshi.hardware.HardwareAbstractionLayer;
 
 /**
- * Classe chargée d'alimentée le topic "monitoring.cpu.01" avec les données mesurées de consommation de CPU. <br/>
+ * Classe chargée d'alimentée le topic "monitoring.cpu.01" avec les données
+ * mesurées de consommation de CPU. <br/>
  * 
  * @See https://github.com/oshi/oshi
  */
 @Component
+@Slf4j
 public class CpuProducer implements CommandLineRunner {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(CpuProducer.class);
 	public final static String HEADER_VERSION = "X-Version";
 
 	public enum VersionMessageCpu {
@@ -68,8 +68,7 @@ public class CpuProducer implements CommandLineRunner {
 
 	/**
 	 * 
-	 * @param nbIterations
-	 *            Nb de messages à envoyer dans le topic Kafka
+	 * @param nbIterations Nb de messages à envoyer dans le topic Kafka
 	 */
 	public CpuProducer(int nbIterations) {
 		this.nbIterations = nbIterations;
@@ -79,7 +78,8 @@ public class CpuProducer implements CommandLineRunner {
 	}
 
 	/**
-	 * Setters pour définir le nombre d'itérations qui restent à faire. Un nombre négatif provoque une boucle infinie.
+	 * Setters pour définir le nombre d'itérations qui restent à faire. Un nombre
+	 * négatif provoque une boucle infinie.
 	 * 
 	 * @param nbIterations
 	 */
@@ -115,7 +115,8 @@ public class CpuProducer implements CommandLineRunner {
 			long totalCpu = user + nice + sys + idle + iowait + irq + softirq + steal;
 
 			synchronized (this) {
-				// synchronized garantit que la version ne change pas entre le "switch" et la construction du message
+				// synchronized garantit que la version ne change pas entre le "switch" et la
+				// construction du message
 				switch (version) {
 				case v1:
 					CpuUsage1 cpuUsage1 = CpuUsage1.newBuilder()//
@@ -143,14 +144,15 @@ public class CpuProducer implements CommandLineRunner {
 
 					break;
 				default:
-					LOGGER.error("Version non gérée, lors de la production d'un message : {}", version);
+					log.error("Version non gérée, lors de la production d'un message : {}", version);
 				}
 			}
 
 			kafkaTemplate.send(message);
 
 			// Alternative :
-			// ProducerRecord<String, CpuUsage> record = new ProducerRecord<>(topicName, cpuUsage);
+			// ProducerRecord<String, CpuUsage> record = new ProducerRecord<>(topicName,
+			// cpuUsage);
 			// record.headers().add("X-Version", "v1".getBytes());
 			// kafkaTemplate.send(record);
 

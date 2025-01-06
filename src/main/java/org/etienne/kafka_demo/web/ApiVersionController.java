@@ -1,19 +1,18 @@
 package org.etienne.kafka_demo.web;
 
 import org.etienne.kafka_demo.CpuProducer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/api/version")
+@Slf4j
 public class ApiVersionController {
-
-	private static Logger LOGGER = LoggerFactory.getLogger(ApiVersionController.class);
 
 	@Autowired
 	CpuProducer cpuProducer;
@@ -24,7 +23,7 @@ public class ApiVersionController {
 			throw new IllegalArgumentException("Version non valide : " + version);
 		}
 
-		LOGGER.info("Version sélectionnée : {}", version);
+		log.info("Version sélectionnée : {}", version);
 		cpuProducer.setVersion(CpuProducer.VersionMessageCpu.valueOf(version));
 	}
 }

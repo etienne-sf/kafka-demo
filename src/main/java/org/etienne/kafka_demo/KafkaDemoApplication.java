@@ -16,7 +16,10 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SpringBootApplication
+@Slf4j
 public class KafkaDemoApplication {
 
 	@Value("${kafka.host}")
@@ -54,15 +57,17 @@ public class KafkaDemoApplication {
 	}
 
 	/**
-	 * Consruction de la {@link Map} des schémas avro pour le topic des CPU. La clé est la version (v1, v2...). La
-	 * valeur est l'instance de {@link Schema} correspondante.
+	 * Consruction de la {@link Map} des schémas avro pour le topic des CPU. La clé
+	 * est la version (v1, v2...). La valeur est l'instance de {@link Schema}
+	 * correspondante.
 	 * 
 	 * @param util
 	 * @return
 	 */
 	@Bean
 	public Map<String, Schema> schemasMonitoringCpu(Util util) {
-		// Constructionn du singletong accessibles aux sérialiseurs et désérialiseurs en même temps
+		// Constructionn du singletong accessibles aux sérialiseurs et désérialiseurs en
+		// même temps
 		schemasMonitoringCpu = new HashMap<>();
 
 		schemasMonitoringCpu.put("v1", util.loadSchema("avro/monitoring.cpu_v1.avsc"));

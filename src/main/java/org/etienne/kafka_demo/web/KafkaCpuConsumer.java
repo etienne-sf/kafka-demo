@@ -29,7 +29,10 @@ public class KafkaCpuConsumer {
 	@Autowired
 	Map<String, Schema> schemasMonitoringCpu;
 
-	/** Dernier message reçu sur Kafka. Ce message sera récupéré par la page web pour affichage */
+	/**
+	 * Dernier message reçu sur Kafka. Ce message sera récupéré par la page web pour
+	 * affichage
+	 */
 	private Object derniereMesureRecu;
 
 	@PostConstruct
@@ -47,8 +50,8 @@ public class KafkaCpuConsumer {
 	}
 
 	/**
-	 * Lecture du tableau des dernières mesures reçues sur Kafka. La taille du tableau est déterminée par
-	 * {@link #MAX_NB_VALEURS}
+	 * Lecture du tableau des dernières mesures reçues sur Kafka. La taille du
+	 * tableau est déterminée par {@link #MAX_NB_VALEURS}
 	 * 
 	 * @return
 	 */

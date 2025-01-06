@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -76,6 +78,11 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.confluent.ksql</groupId>
+			<artifactId>ksqldb-api-client</artifactId>
+			<version>6.2.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.avro</groupId>
@@ -87,7 +94,8 @@
 			<artifactId>kafka-avro-serializer</artifactId>
 			<version>7.7.1</version>
 		</!dependency -->
-		<!-- Pour suivre la consommation de CPU, RAM (...) de la machine. SIGAR nécessite de déployer manuellement la bonne DLL, et ça me crash la JVM -->
+		<!-- Pour suivre la consommation de CPU, RAM (...) de la machine. SIGAR
+		nécessite de déployer manuellement la bonne DLL, et ça me crash la JVM -->
 		<!--dependency>
 			<groupId>org.hyperic.sigar</groupId>
 			<artifactId>sigar</artifactId>
@@ -100,6 +108,12 @@
 			<artifactId>oshi-core</artifactId>
 			<version>6.6.5</version>
 		</dependency>
+		
+		<!-- Différentes annotations pour simplifier le code -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
 
 		<!-- Dépendances pour les tests -->
 		<dependency>
@@ -115,7 +129,6 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>kafka</artifactId>
-			<version>1.19.3</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -135,8 +148,10 @@
 							<goal>schema</goal>
 						</goals>
 						<configuration>
-							<sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
-							<outputDirectory>${project.basedir}/target/generated-sources/avro</outputDirectory>
+							<sourceDirectory>
+								${project.basedir}/src/main/resources/avro</sourceDirectory>
+							<outputDirectory>
+								${project.basedir}/target/generated-sources/avro</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -153,7 +168,8 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>${project.basedir}/target/generated-sources/avro</source>
+								<source>
+									${project.basedir}/target/generated-sources/avro</source>
 							</sources>
 						</configuration>
 					</execution>
