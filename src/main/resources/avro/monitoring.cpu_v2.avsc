@@ -4,6 +4,14 @@
   "namespace": "org.etienne.kafka_demo",
   "fields": [
     {
+      "name": "timestamp",
+      "type" : {
+	      "type": "long",
+	      "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp de création de l'enregistrement"
+    },
+    {
       "name": "cpu",
       "type": "double",
       "doc": "Pourcentage d'utilisation total du processeur"

@@ -3,11 +3,11 @@ package org.etienne.kafka_demo.utils;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.specific.SpecificDatumReader;
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
@@ -53,7 +53,7 @@ public class AvroDeserializer<T extends SpecificRecordBase> implements Deseriali
 				return null;
 			} else {
 				String schemaVersion = extractVersionFromHeaders(headers);
-				DatumReader<GenericRecord> datumReader = new SpecificDatumReader<>(//
+				DatumReader<SpecificRecord> datumReader = new SpecificDatumReader<>(//
 						// targetType.getConstructor().newInstance().getSchema()
 						KafkaDemoApplication.schemasMonitoringCpu.get(schemaVersion));
 				Decoder decoder = DecoderFactory.get().binaryDecoder(data, null);

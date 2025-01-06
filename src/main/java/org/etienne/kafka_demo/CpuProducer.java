@@ -3,6 +3,7 @@
  */
 package org.etienne.kafka_demo;
 
+import java.time.Instant;
 import java.util.Map;
 
 import org.apache.avro.Schema;
@@ -120,6 +121,7 @@ public class CpuProducer implements CommandLineRunner {
 				switch (version) {
 				case v1:
 					CpuUsage1 cpuUsage1 = CpuUsage1.newBuilder()//
+							.setTimestamp(Instant.now())//
 							.setCpu(processor.getSystemCpuLoadBetweenTicks(prevTicks))//
 							.build();
 					message = MessageBuilder//
@@ -131,6 +133,7 @@ public class CpuProducer implements CommandLineRunner {
 					break;
 				case v2:
 					CpuUsage2 cpuUsage2 = CpuUsage2.newBuilder()//
+							.setTimestamp(Instant.now())//
 							.setCpu(processor.getSystemCpuLoadBetweenTicks(prevTicks))//
 							.setUser((double) user / totalCpu)//
 							.setSys((double) sys / totalCpu)//
